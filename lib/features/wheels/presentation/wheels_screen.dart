@@ -32,6 +32,8 @@ class WheelsScreen extends ConsumerWidget {
   }
 
   Future<void> _createWheel(BuildContext context, WidgetRef ref) async {
+    final wheelCountBeforeCreate =
+        ref.read(appControllerProvider).valueOrNull?.wheels.length ?? 0;
     final name = await showDialog<String>(
       context: context,
       builder: (_) => const _WheelNameDialog(
@@ -46,6 +48,15 @@ class WheelsScreen extends ConsumerWidget {
       await ref
           .read(appControllerProvider.notifier)
           .createWheel(name: name.trim());
+      final wheelCountAfterCreate =
+          ref.read(appControllerProvider).valueOrNull?.wheels.length ??
+          wheelCountBeforeCreate;
+      await ref
+          .read(adMonetizationServiceProvider)
+          .registerWheelCreated(
+            wheelCountBeforeCreate: wheelCountBeforeCreate,
+            wheelCountAfterCreate: wheelCountAfterCreate,
+          );
     }
   }
 

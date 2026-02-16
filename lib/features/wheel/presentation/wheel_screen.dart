@@ -377,9 +377,20 @@ class _WheelScreenState extends ConsumerState<WheelScreen> {
           .loadPresetIntoCurrent(selected);
     }
     if (mode == 'save') {
+      final wheelCountBeforeCreate =
+          ref.read(appControllerProvider).valueOrNull?.wheels.length ?? 0;
       await ref
           .read(appControllerProvider.notifier)
           .savePresetAsWheel(selected);
+      final wheelCountAfterCreate =
+          ref.read(appControllerProvider).valueOrNull?.wheels.length ??
+          wheelCountBeforeCreate;
+      await ref
+          .read(adMonetizationServiceProvider)
+          .registerWheelCreated(
+            wheelCountBeforeCreate: wheelCountBeforeCreate,
+            wheelCountAfterCreate: wheelCountAfterCreate,
+          );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Saved "${selected.name}" as a wheel.')),
@@ -410,6 +421,11 @@ class _WheelScreenState extends ConsumerState<WheelScreen> {
     }
     if (settings.soundEnabled) {
       SystemSound.play(SystemSoundType.alert);
+    }
+
+    await ref.read(adMonetizationServiceProvider).registerCompletedSpin();
+    if (!mounted) {
+      return;
     }
 
     final action = await showResultDialog(

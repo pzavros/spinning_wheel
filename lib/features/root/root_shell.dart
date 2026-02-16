@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/wheel/presentation/wheel_screen.dart';
 import '../../features/wheels/presentation/wheels_screen.dart';
+import '../../core/providers/app_providers.dart';
+import '../../shared/widgets/ad_banner.dart';
 import '../../shared/widgets/glass_panel.dart';
 
-class RootShell extends StatefulWidget {
+class RootShell extends ConsumerStatefulWidget {
   const RootShell({super.key});
 
   @override
-  State<RootShell> createState() => _RootShellState();
+  ConsumerState<RootShell> createState() => _RootShellState();
 }
 
-class _RootShellState extends State<RootShell> {
+class _RootShellState extends ConsumerState<RootShell> {
   static const _navItems = <_RootNavItem>[
     _RootNavItem(label: 'Spin', icon: Icons.casino_rounded),
     _RootNavItem(label: 'Wheels', icon: Icons.toll_rounded),
@@ -23,6 +26,8 @@ class _RootShellState extends State<RootShell> {
 
   @override
   Widget build(BuildContext context) {
+    ref.read(adMonetizationServiceProvider);
+
     final pages = <Widget>[
       const WheelScreen(),
       WheelsScreen(
@@ -58,27 +63,37 @@ class _RootShellState extends State<RootShell> {
         },
         child: KeyedSubtree(key: ValueKey(_index), child: pages[_index]),
       ),
+
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        child: GlassPanel(
-          borderRadius: 30,
-          padding: const EdgeInsets.all(6),
-          child: Row(
-            children: List.generate(_navItems.length, (itemIndex) {
-              final item = _navItems[itemIndex];
-              final isSelected = itemIndex == _index;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: _RootNavButton(
-                    item: item,
-                    isSelected: isSelected,
-                    onTap: () => setState(() => _index = itemIndex),
-                  ),
-                ),
-              );
-            }),
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: Center(child: AdBanner()),
+            ),
+            GlassPanel(
+              borderRadius: 30,
+              padding: const EdgeInsets.all(6),
+              child: Row(
+                children: List.generate(_navItems.length, (itemIndex) {
+                  final item = _navItems[itemIndex];
+                  final isSelected = itemIndex == _index;
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: _RootNavButton(
+                        item: item,
+                        isSelected: isSelected,
+                        onTap: () => setState(() => _index = itemIndex),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ],
         ),
       ),
     );

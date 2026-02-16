@@ -12,6 +12,7 @@ A production-style Flutter app for premium animated decision wheels.
 - Result modal with blur, confetti, haptics, optional sounds, share action
 - Settings persistence: sound, haptics, remove winner, background intensity, theme, reset app
 - Riverpod-based app state + SharedPreferences persistence
+- AdMob monetization: banner ads + rewarded interstitial cadence
 
 ## Tech stack
 
@@ -24,6 +25,24 @@ A production-style Flutter app for premium animated decision wheels.
 
 1. `flutter pub get`
 2. `flutter run`
+
+## AdMob setup
+
+- This repo now uses `google_mobile_ads`.
+- Default IDs in code are Google test IDs so local development is safe.
+- For production earnings, replace app IDs and pass your real ad unit IDs:
+  - Android banner: `--dart-define=ADMOB_BANNER_ANDROID=ca-app-pub-xxxx/yyyy`
+  - iOS banner: `--dart-define=ADMOB_BANNER_IOS=ca-app-pub-xxxx/yyyy`
+  - Android rewarded interstitial: `--dart-define=ADMOB_REWARDED_INTERSTITIAL_ANDROID=ca-app-pub-xxxx/yyyy`
+  - iOS rewarded interstitial: `--dart-define=ADMOB_REWARDED_INTERSTITIAL_IOS=ca-app-pub-xxxx/yyyy`
+- Replace test app IDs in:
+  - `android/app/src/main/AndroidManifest.xml`
+  - `ios/Runner/Info.plist`
+
+Current monetization behavior:
+- Banner shown on `Wheels` and `Settings` tabs (not on the main spin tab).
+- Rewarded interstitial attempted every 2 completed spins.
+- Rewarded interstitial attempted when creating wheels after the first user-created wheel.
 
 ## Test
 
